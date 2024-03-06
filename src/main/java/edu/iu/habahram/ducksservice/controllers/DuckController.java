@@ -1,7 +1,6 @@
 package edu.iu.habahram.ducksservice.controllers;
 
 import edu.iu.habahram.ducksservice.model.DuckData;
-import edu.iu.habahram.ducksservice.model.Duck;
 import edu.iu.habahram.ducksservice.repository.DucksRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -24,14 +24,14 @@ public class DuckController {
     }
 
 
-   @PostMapping
+    @PostMapping
     public boolean add(@RequestBody DuckData duck) {
-       try {
-           return ducksRepository.add(duck);
-       } catch (IOException e) {
-           throw new RuntimeException(e);
-       }
-   }
+        try {
+            return ducksRepository.add(duck);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @GetMapping
     public List<DuckData> findAll() {
@@ -46,7 +46,7 @@ public class DuckController {
     public ResponseEntity<DuckData> find(@PathVariable int id) {
         try {
             DuckData duck = ducksRepository.find(id);
-            if(duck != null) {
+            if (duck != null) {
                 return ResponseEntity
                         .status(HttpStatus.FOUND)
                         .body(duck);

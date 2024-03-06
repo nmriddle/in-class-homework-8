@@ -1,6 +1,5 @@
 package edu.iu.habahram.ducksservice.repository;
 
-import edu.iu.habahram.ducksservice.model.Duck;
 import edu.iu.habahram.ducksservice.model.DuckData;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,25 +12,26 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
 public class DucksRepository {
+    private static final String NEW_LINE = System.lineSeparator();
+    private static final String DATABASE_NAME = "ducks/db.txt";
+    private String IMAGES_FOLDER_PATH = "ducks/images/";
+    private String AUDIO_FOLDER_PATH = "ducks/audio/";
     public DucksRepository() {
         File ducksImagesDirectory = new File("ducks/images");
-        if(!ducksImagesDirectory.exists()) {
+        if (!ducksImagesDirectory.exists()) {
             ducksImagesDirectory.mkdirs();
         }
         File ducksAudioDirectory = new File("ducks/audio");
-        if(!ducksAudioDirectory.exists()) {
+        if (!ducksAudioDirectory.exists()) {
             ducksAudioDirectory.mkdirs();
         }
     }
 
-    private String IMAGES_FOLDER_PATH = "ducks/images/";
-    private String AUDIO_FOLDER_PATH = "ducks/audio/";
-    private static final String NEW_LINE = System.lineSeparator();
-    private static final String DATABASE_NAME = "ducks/db.txt";
     private static void appendToFile(Path path, String content)
             throws IOException {
         Files.write(path,
@@ -39,6 +39,7 @@ public class DucksRepository {
                 StandardOpenOption.CREATE,
                 StandardOpenOption.APPEND);
     }
+
     public boolean add(DuckData duckData) throws IOException {
         Path path = Paths.get(DATABASE_NAME);
         String data = duckData.toLine();
@@ -92,27 +93,31 @@ public class DucksRepository {
         Path path = Paths.get(DATABASE_NAME);
         List<String> data = Files.readAllLines(path);
         for (String line : data) {
-            if(!line.trim().isEmpty()) {
+            if (!line.trim().isEmpty()) {
                 DuckData d = DuckData.fromLine(line);
                 result.add(d);
             }
         }
+        DuckData[] ducks = result.toArray(new DuckData[0]);
+        Arrays.sort(ducks);
+        result = Arrays.asList(ducks);
         return result;
     }
 
     public DuckData find(int id) throws IOException {
         List<DuckData> ducks = findAll();
-        for(DuckData duck : ducks) {
+        for (DuckData duck : ducks) {
             if (duck.id() == id) {
                 return duck;
             }
         }
         return null;
     }
+
     public List<DuckData> search(String type) throws IOException {
         List<DuckData> ducks = findAll();
         List<DuckData> result = new ArrayList<>();
-        for(DuckData duck : ducks) {
+        for (DuckData duck : ducks) {
             if (type != null && !duck.type().equalsIgnoreCase(type)) {
                 continue;
             }
